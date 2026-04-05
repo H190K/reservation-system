@@ -9,3 +9,9 @@ The system follows a *Client-Server Architecture* to decouple the User Interface
 ## 3. Architectural Goals & Constraints
 * *Goals:* High performance (under 1s), security (credential management), and high usability (booking under 3 minutes).
 * *Constraints:* Must use Python for Backend, HTML/CSS/JS for Frontend, and integrate with an external Payment Gateway API.
+
+## 5. Logical Architecture + (Use Case + ERD)
+This view focuses on the functional components and their relationships.
+* *User Interface:* Responsive web design for cross-browser compatibility.
+* *Business Logic:* Python-based API routes handling movie schedules and seat availability.
+* *Data Management:* A relational database to ensure ACID compliance, preventing double-booking of seats.
