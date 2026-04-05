@@ -21,3 +21,23 @@ Describes the system’s runtime behavior and concurrency handling.
 
 * *Concurrency:* If two users attempt to book the same seat simultaneously, the system uses a *Row Lock* in the database.
 * *Availability:* The system allows movie browsing even if the external Payment Gateway is down.
+
+## 7. Development Architecture + (C4 Level 2 (Container))
+Focuses on the software organization and the development environment.
+
+### Structure
+* *Frontend:* HTML, CSS, and JS files.
+* *Backend:* Python scripts and API routes.
+* *docs/:* Documentation and architectural diagrams.
+
+*Rationale:* Python was selected for rapid development and its robust library support for ORM and API handling.
+
+## 8. Physical Architecture (Deployment) + (Deployment Diagram)
+Describes the physical distribution of components.
+
+* *Environment:* A web-based platform accessible through modern browsers.
+* *Deployment:* The Backend and Frontend are hosted on a web server, connecting over the network to a Relational Database and an external Payment Gateway.
+
+## 9. Scenarios
+* *Successful Reservation:* User clicks book -> Frontend checks seat -> Backend queries DB -> Success returned.
+* *Simultaneous Booking:* Two users click "Book" for seat A1 -> System locks row; User 1 succeeds, User 2 receives error.
