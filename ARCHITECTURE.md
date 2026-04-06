@@ -18,8 +18,8 @@ This project uses a simple client-server setup:
 
 The main functional view of the system.
 
-![Use Case Diagram](ARCHITECTURE IMGS/logical-use-case.png)
-![ERD](ARCHITECTURE IMGS/logical-erd.jpeg)
+![Use Case Diagram](ARCHITECTURE%20IMGS/logical-use-case.png)
+![ERD](ARCHITECTURE%20IMGS/logical-erd.jpeg)
 
 ## Runtime Flow
 
@@ -33,8 +33,8 @@ The main functional view of the system.
 
 Runtime behavior and concurrency handling.
 
-![Concurrency](ARCHITECTURE IMGS/process-concurrency.png)
-![Availability](ARCHITECTURE IMGS/process-availability.png)
+![Concurrency](ARCHITECTURE%20IMGS/process-concurrency.png)
+![Availability](ARCHITECTURE%20IMGS/process-availability.png)
 
 ## Data Flow
 
@@ -46,7 +46,7 @@ Runtime behavior and concurrency handling.
 
 How the codebase is organized.
 
-![C4 Container](ARCHITECTURE IMGS/development-container.png)
+![C4 Container](ARCHITECTURE%20IMGS/development-container.png)
 
 - Frontend: HTML, CSS, and JavaScript pages.
 - Backend: Python API routes and helper modules.
@@ -58,14 +58,14 @@ Python is used for the backend because it is fast to develop with and fits the A
 
 How the application is deployed and accessed.
 
-![Deployment Diagram](ARCHITECTURE IMGS/physical-deployment.png)
+![Deployment Diagram](ARCHITECTURE%20IMGS/physical-deployment.png)
 
 ## Scenarios
 
 Example booking outcomes.
 
-![Successful Reservation](ARCHITECTURE IMGS/scenario-successful-reservation.png)
-![Simultaneous Booking](ARCHITECTURE IMGS/scenario-simultaneous-booking.png)
+![Successful Reservation](ARCHITECTURE%20IMGS/scenario-successful-reservation.png)
+![Simultaneous Booking](ARCHITECTURE%20IMGS/scenario-simultaneous-booking.png)
 
 ## Size & Performance
 

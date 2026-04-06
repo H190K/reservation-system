@@ -1,5 +1,17 @@
 # Cinema Online Ticket Reservation System
 
+## SOFTWARE ARCHITECTURE
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+
+![Altinbas University](https://img.shields.io/badge/Altinbas%20University-1B365D?style=for-the-badge)
+![Project / Software Architecture / SWE 332](https://img.shields.io/badge/Project%20%2F%20Software%20Architecture%20%2F%20SWE%20332-6B7280?style=for-the-badge)
+
 ## Overview
 
 Cinema booking app with a Python backend, SQLite database, and a static HTML/CSS/JS frontend.
