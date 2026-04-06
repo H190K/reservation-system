@@ -2,6 +2,7 @@
 <html lang="en"> 
  <head> 
   <meta charset="UTF-8"> 
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23020307'/%3E%3Cpath d='M18 20h28v24H18z' fill='%23ff2c1f'/%3E%3Ccircle cx='23' cy='26' r='2.5' fill='white'/%3E%3Ccircle cx='23' cy='38' r='2.5' fill='white'/%3E%3Ccircle cx='41' cy='26' r='2.5' fill='white'/%3E%3Ccircle cx='41' cy='38' r='2.5' fill='white'/%3E%3C/svg%3E"> 
   <link rel="stylesheet" href="./login.css"> 
   <style>
     .inputBox {
@@ -11,13 +12,30 @@
     .links {
       margin: 20px 0 25px 0;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
     }
     .content h2 {
       margin-bottom: 30px;
     }
     .signin {
       padding: 20px 0;
+    }
+    .top-actions {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 18px;
+    }
+    .back-button {
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 999px;
+      padding: 8px 14px;
+    }
+    .back-button:hover {
+      border-color: #fff;
+      background: rgba(255, 255, 255, 0.08);
     }
     input[type="submit"] {
       margin-top: 5px;
@@ -29,6 +47,9 @@
    <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> <span></span> 
    <div class="signin"> 
     <div class="content"> 
+     <div class="top-actions">
+      <a href="main.html" class="back-button">Back</a>
+     </div>
      <h2>Sign In</h2> 
      <div class="form"> 
       <form onsubmit="return validateForm(event)">
@@ -39,10 +60,7 @@
         <input type="password" id="password" required> <i>Password</i> 
        </div> 
        <div class="links"> 
-        <div class="links"> 
-  <a href="forgetpass.html">Forgot Password</a> 
-  <a href="signup.html">Signup</a> 
-</div>
+        <a href="forgetpass.html">Forgot Password</a> 
        </div> 
        <div class="inputBox"> 
         <input type="submit" value="Login"> 
@@ -52,6 +70,7 @@
     </div> 
    </div> 
   </section>
+  <script src="app-config.js"></script>
   <script>
   async function validateForm(event) {
     event.preventDefault();
@@ -63,7 +82,7 @@
     }
 
     try {
-      var response = await fetch('http://127.0.0.1:8000/auth/login', {
+      var response = await fetch(window.APP_CONFIG.apiBaseUrl + '/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

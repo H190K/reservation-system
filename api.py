@@ -13,6 +13,14 @@ from jose import JWTError, jwt
 from pydantic import BaseModel, EmailStr, Field
 
 import db_setup
+from payment_gateway import (
+    cancel_pending_booking,
+    create_pending_booking,
+    get_booking_details,
+    get_test_cards,
+    initiate_payment_session,
+    process_booking_payment,
+)
 
 
 DB_PATH = Path(__file__).resolve().parent / db_setup.DB_NAME
@@ -55,12 +63,26 @@ class BookingRequest(BaseModel):
 
 class PaymentInitRequest(BaseModel):
     booking_id: int
-    provider: str = "manual"
+    provider: str = "stripe_sandbox"
 
 
 class PaymentConfirmRequest(BaseModel):
     payment_id: int
-    provider_ref: str | None = None
+    cardholder_name: str = Field(min_length=2, max_length=60)
+    card_number: str = Field(min_length=12, max_length=24)
+    expiry_month: int = Field(ge=1, le=12)
+    expiry_year: int = Field(ge=2024, le=2100)
+    cvc: str = Field(min_length=3, max_length=4)
+
+
+class PaymentCheckoutRequest(BaseModel):
+    payment_id: int
+    provider: str = "stripe_sandbox"
+    cardholder_name: str = Field(min_length=2, max_length=60)
+    card_number: str = Field(min_length=12, max_length=24)
+    expiry_month: int = Field(ge=1, le=12)
+    expiry_year: int = Field(ge=2024, le=2100)
+    cvc: str = Field(min_length=3, max_length=4)
 
 
 def get_conn() -> sqlite3.Connection:
@@ -182,6 +204,32 @@ def seed_data(conn: sqlite3.Connection) -> None:
         )
 
 
+def seed_test_user(conn: sqlite3.Connection) -> None:
+    existing_user = conn.execute(
+        "SELECT id FROM users WHERE username = ?",
+        ("test",),
+    ).fetchone()
+
+    password_hash = hash_password("test123")
+    if existing_user:
+        conn.execute(
+            """
+            UPDATE users
+            SET email = ?, password_hash = ?, is_active = 1, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+            """,
+            ("test@example.com", password_hash, existing_user["id"]),
+        )
+    else:
+        conn.execute(
+            """
+            INSERT INTO users (username, email, password_hash, role, is_active)
+            VALUES (?, ?, ?, 'customer', 1)
+            """,
+            ("test", "test@example.com", password_hash),
+        )
+
+
 @app.on_event("startup")
 def startup_event() -> None:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -189,6 +237,7 @@ def startup_event() -> None:
         conn.row_factory = sqlite3.Row
         db_setup.create_tables(conn)
         seed_data(conn)
+        seed_test_user(conn)
 
 
 @app.get("/")
@@ -246,6 +295,16 @@ def forgot_password(payload: ForgotPasswordRequest) -> dict[str, str]:
             )
 
     return {"message": "If that email exists, a reset link has been generated"}
+
+
+@app.get("/auth/me")
+def get_current_user_profile(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+    with get_conn() as conn:
+        user = conn.execute(
+            "SELECT id, username, email, role, created_at FROM users WHERE id = ?",
+            (current_user["id"],),
+        ).fetchone()
+    return dict(user) if user else {}
 
 
 @app.get("/movies")
@@ -309,150 +368,65 @@ def get_showtime_seats(showtime_id: int) -> dict[str, Any]:
 
 @app.post("/bookings")
 def create_booking(payload: BookingRequest, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
-    unique_labels = sorted(set(payload.seat_labels))
-
     with get_conn() as conn:
-        try:
-            conn.execute("BEGIN IMMEDIATE")
-
-            showtime = conn.execute(
-                "SELECT id, screen_id, base_price FROM showtimes WHERE id = ? AND status = 'scheduled'",
-                (payload.showtime_id,),
-            ).fetchone()
-            if not showtime:
-                raise HTTPException(status_code=404, detail="Showtime not found or unavailable")
-
-            placeholders = ",".join(["?"] * len(unique_labels))
-            seat_rows = conn.execute(
-                f"SELECT id, seat_label FROM seats WHERE screen_id = ? AND seat_label IN ({placeholders}) AND is_active = 1",
-                (showtime["screen_id"], *unique_labels),
-            ).fetchall()
-
-            if len(seat_rows) != len(unique_labels):
-                raise HTTPException(status_code=400, detail="One or more selected seats are invalid")
-
-            seat_ids = [row["id"] for row in seat_rows]
-            id_placeholders = ",".join(["?"] * len(seat_ids))
-            taken = conn.execute(
-                f"SELECT seat_id FROM booking_seats WHERE showtime_id = ? AND seat_id IN ({id_placeholders})",
-                (payload.showtime_id, *seat_ids),
-            ).fetchall()
-            if taken:
-                raise HTTPException(status_code=409, detail="One or more seats are already booked")
-
-            total_amount = float(showtime["base_price"]) * len(unique_labels)
-            booking_code = f"BK-{secrets.token_hex(4).upper()}"
-            conn.execute(
-                """
-                INSERT INTO bookings (user_id, showtime_id, booking_code, seats_count, total_amount, status)
-                VALUES (?, ?, ?, ?, ?, 'confirmed')
-                """,
-                (current_user["id"], payload.showtime_id, booking_code, len(unique_labels), total_amount),
-            )
-            booking_id = conn.execute("SELECT last_insert_rowid() AS id").fetchone()["id"]
-
-            for seat_id in seat_ids:
-                conn.execute(
-                    "INSERT INTO booking_seats (booking_id, showtime_id, seat_id, price) VALUES (?, ?, ?, ?)",
-                    (booking_id, payload.showtime_id, seat_id, showtime["base_price"]),
-                )
-
-            conn.commit()
-        except HTTPException:
-            conn.rollback()
-            raise
-        except sqlite3.IntegrityError:
-            conn.rollback()
-            raise HTTPException(status_code=409, detail="Booking conflict. Please choose different seats")
-
-    return {
-        "message": "Booking confirmed",
-        "booking_id": booking_id,
-        "booking_code": booking_code,
-        "showtime_id": payload.showtime_id,
-        "seat_labels": unique_labels,
-        "total_amount": total_amount,
-    }
+        return create_pending_booking(
+            conn,
+            user_id=current_user["id"],
+            showtime_id=payload.showtime_id,
+            seat_labels=payload.seat_labels,
+        )
 
 
 @app.get("/bookings/{booking_id}")
 def get_booking(booking_id: int, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     with get_conn() as conn:
-        booking = conn.execute(
-            """
-            SELECT id, user_id, showtime_id, booking_code, seats_count, total_amount, status, created_at
-            FROM bookings
-            WHERE id = ?
-            """,
-            (booking_id,),
-        ).fetchone()
+        return get_booking_details(conn, booking_id=booking_id, user_id=current_user["id"])
 
-        if not booking:
-            raise HTTPException(status_code=404, detail="Booking not found")
-        if booking["user_id"] != current_user["id"]:
-            raise HTTPException(status_code=403, detail="Not allowed")
 
-        seats = conn.execute(
-            """
-            SELECT s.seat_label
-            FROM booking_seats bs
-            JOIN seats s ON s.id = bs.seat_id
-            WHERE bs.booking_id = ?
-            ORDER BY s.row_label, s.seat_number
-            """,
-            (booking_id,),
-        ).fetchall()
+@app.post("/bookings/{booking_id}/cancel")
+def cancel_booking(booking_id: int, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+    with get_conn() as conn:
+        return cancel_pending_booking(conn, booking_id=booking_id, user_id=current_user["id"])
 
-    result = dict(booking)
-    result["seat_labels"] = [s["seat_label"] for s in seats]
-    return result
+
+@app.get("/payments/test-cards")
+def payment_test_cards() -> dict[str, Any]:
+    return {"provider": "stripe_sandbox", "cards": get_test_cards()}
 
 
 @app.post("/payments/initiate")
 def payment_initiate(payload: PaymentInitRequest, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     with get_conn() as conn:
-        booking = conn.execute(
-            "SELECT id, user_id, total_amount FROM bookings WHERE id = ?",
-            (payload.booking_id,),
-        ).fetchone()
-        if not booking:
-            raise HTTPException(status_code=404, detail="Booking not found")
-        if booking["user_id"] != current_user["id"]:
-            raise HTTPException(status_code=403, detail="Not allowed")
-
-        conn.execute(
-            "INSERT INTO payments (booking_id, provider, amount, status) VALUES (?, ?, ?, 'initiated')",
-            (payload.booking_id, payload.provider, booking["total_amount"]),
-        )
-        payment_id = conn.execute("SELECT last_insert_rowid() AS id").fetchone()["id"]
-
-    return {"payment_id": payment_id, "status": "initiated"}
+        return initiate_payment_session(conn, user_id=current_user["id"], booking_id=payload.booking_id)
 
 
 @app.post("/payments/confirm")
-def payment_confirm(payload: PaymentConfirmRequest, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, str]:
+def payment_confirm(payload: PaymentConfirmRequest, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     with get_conn() as conn:
-        payment = conn.execute(
-            """
-            SELECT p.id, p.booking_id, b.user_id
-            FROM payments p
-            JOIN bookings b ON b.id = p.booking_id
-            WHERE p.id = ?
-            """,
-            (payload.payment_id,),
-        ).fetchone()
-        if not payment:
-            raise HTTPException(status_code=404, detail="Payment not found")
-        if payment["user_id"] != current_user["id"]:
-            raise HTTPException(status_code=403, detail="Not allowed")
-
-        conn.execute(
-            "UPDATE payments SET status = 'paid', provider_ref = ?, paid_at = CURRENT_TIMESTAMP WHERE id = ?",
-            (payload.provider_ref, payload.payment_id),
-        )
-        conn.execute(
-            "UPDATE bookings SET status = 'confirmed', updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-            (payment["booking_id"],),
+        return process_booking_payment(
+            conn,
+            user_id=current_user["id"],
+            payment_id=payload.payment_id,
+            cardholder_name=payload.cardholder_name,
+            card_number=payload.card_number,
+            expiry_month=payload.expiry_month,
+            expiry_year=payload.expiry_year,
+            cvc=payload.cvc,
         )
 
-    return {"status": "paid"}
+
+@app.post("/payments/checkout")
+def payment_checkout(
+    payload: PaymentCheckoutRequest, current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
+    with get_conn() as conn:
+        return process_booking_payment(
+            conn,
+            user_id=current_user["id"],
+            payment_id=payload.payment_id,
+            cardholder_name=payload.cardholder_name,
+            card_number=payload.card_number,
+            expiry_month=payload.expiry_month,
+            expiry_year=payload.expiry_year,
+            cvc=payload.cvc,
+        )
