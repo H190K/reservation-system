@@ -11,16 +11,20 @@ This project uses a simple client-server setup:
 
 ## Scope
 
+The system provides:
+
 - Online movie ticket booking with seat selection
 - User account management (registration, login)
 - Movie and showtime browsing
 - Seat reservation with locking to prevent double-booking
 - Booking confirmation via sandbox payment flow
 
-## Goals & Constraints
+## Constraints
 
-- Goals: responsive booking flow, simple management, and reliable seat reservation.
-- Constraints: Python backend, HTML/CSS/JS frontend, SQLite database, and sandbox payment integration.
+- Python backend with FastAPI framework
+- HTML/CSS/JS frontend (static files)
+- SQLite database for persistence
+- Sandbox payment integration (no real payments)
 
 ## Logical Architecture
 
@@ -29,14 +33,6 @@ The main functional view of the system.
 ![Use Case Diagram](ARCHITECTURE%20IMGS/logical-use-case.png)
 ![ERD](ARCHITECTURE%20IMGS/logical-erd.jpeg)
 
-## Runtime Flow
-
-1. The user opens the movie listing in the browser.
-2. Clicking a movie sends the selected showtime and poster into the seat booking page.
-3. The booking page requests seat availability from the FastAPI backend.
-4. The user selects seats and creates a booking.
-5. The sandbox payment flow confirms or cancels the booking.
-
 ## Process Architecture
 
 Runtime behavior and concurrency handling.
@@ -44,7 +40,15 @@ Runtime behavior and concurrency handling.
 ![Concurrency](ARCHITECTURE%20IMGS/process-concurrency.png)
 ![Availability](ARCHITECTURE%20IMGS/process-availability.png)
 
-## Data Flow
+### Runtime Flow
+
+1. The user opens the movie listing in the browser.
+2. Clicking a movie sends the selected showtime and poster into the seat booking page.
+3. The booking page requests seat availability from the FastAPI backend.
+4. The user selects seats and creates a booking.
+5. The sandbox payment flow confirms or cancels the booking.
+
+### Data Flow
 
 - User accounts, bookings, seats, and payments are stored in SQLite.
 - The API seeds sample movies, showtimes, and seats if the database is empty.
@@ -68,13 +72,6 @@ How the application is deployed and accessed.
 
 ![Deployment Diagram](ARCHITECTURE%20IMGS/physical-deployment.png)
 
-## Scenarios
-
-Example booking outcomes.
-
-![Successful Reservation](ARCHITECTURE%20IMGS/scenario-successful-reservation.png)
-![Simultaneous Booking](ARCHITECTURE%20IMGS/scenario-simultaneous-booking.png)
-
 ## Size & Performance
 
 - Performance target: reservation requests should complete quickly enough for a smooth booking flow.
@@ -85,6 +82,13 @@ Example booking outcomes.
 - Security: authentication, password hashing, and payment sandboxing.
 - Reliability: ACID-style database behavior for bookings and seat allocation.
 - Flexibility: payment handling is isolated so providers can be swapped later.
+
+## Scenarios
+
+Example booking outcomes.
+
+![Successful Reservation](ARCHITECTURE%20IMGS/scenario-successful-reservation.png)
+![Simultaneous Booking](ARCHITECTURE%20IMGS/scenario-simultaneous-booking.png)
 
 ## Deployment
 
