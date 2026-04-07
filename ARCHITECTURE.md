@@ -9,6 +9,14 @@ This project uses a simple client-server setup:
 - Database: SQLite file in `source code/cinema_home.db`
 - Payment flow: local sandbox logic in `source code/payment_gateway/`
 
+## Scope
+
+- Online movie ticket booking with seat selection
+- User account management (registration, login)
+- Movie and showtime browsing
+- Seat reservation with locking to prevent double-booking
+- Booking confirmation via sandbox payment flow
+
 ## Goals & Constraints
 
 - Goals: responsive booking flow, simple management, and reliable seat reservation.
@@ -86,6 +94,13 @@ The included launch scripts run the app locally:
 - `run_app.sh` on macOS/Linux
 
 Both scripts start the API on port `8000` and a static frontend server on port `3000`.
+
+## References
+
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [SQLite Documentation](https://www.sqlite.org/docs.html)
+- [MDN Web Docs - HTML/CSS/JS](https://developer.mozilla.org/)
+- [Uvicorn Documentation](https://www.uvicorn.org/)
 
 ## Appendices
 
