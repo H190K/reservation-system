@@ -38,14 +38,14 @@
 
 ## List of Figures
 
-1. **Use Case Diagram** — `ARCHITECTURE%20IMGS/logical-use-case.png`
-2. **ERD** — `ARCHITECTURE%20IMGS/logical-erd.jpeg`
-3. **Concurrency** — `ARCHITECTURE%20IMGS/process-concurrency.png`
-4. **Availability** — `ARCHITECTURE%20IMGS/process-availability.png`
-5. **C4 Container** — `ARCHITECTURE%20IMGS/development-container.png`
-6. **Deployment Diagram** — `ARCHITECTURE%20IMGS/physical-deployment.png`
-7. **Successful Reservation** — `ARCHITECTURE%20IMGS/scenario-successful-reservation.png`
-8. **Simultaneous Booking** — `ARCHITECTURE%20IMGS/scenario-simultaneous-booking.png`
+1. [**Use Case Diagram**](ARCHITECTURE%20IMGS/logical-use-case.png) — `ARCHITECTURE IMGS/logical-use-case.png`
+2. [**ERD**](ARCHITECTURE%20IMGS/logical-erd.jpeg) — `ARCHITECTURE IMGS/logical-erd.jpeg`
+3. [**Concurrency**](ARCHITECTURE%20IMGS/process-concurrency.png) — `ARCHITECTURE IMGS/process-concurrency.png`
+4. [**Availability**](ARCHITECTURE%20IMGS/process-availability.png) — `ARCHITECTURE IMGS/process-availability.png`
+5. [**C4 Container**](ARCHITECTURE%20IMGS/development-container.png) — `ARCHITECTURE IMGS/development-container.png`
+6. [**Deployment Diagram**](ARCHITECTURE%20IMGS/physical-deployment.png) — `ARCHITECTURE IMGS/physical-deployment.png`
+7. [**Successful Reservation**](ARCHITECTURE%20IMGS/scenario-successful-reservation.png) — `ARCHITECTURE IMGS/scenario-successful-reservation.png`
+8. [**Simultaneous Booking**](ARCHITECTURE%20IMGS/scenario-simultaneous-booking.png) — `ARCHITECTURE IMGS/scenario-simultaneous-booking.png`
 
 ## 1. Scope
 
