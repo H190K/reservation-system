@@ -155,9 +155,38 @@ Both scripts start:
 
 ## 9. Scenarios
 
-Example booking outcomes (Kruchten’s “+1” view).
+Example booking outcomes (Kruchten's "+1" view).
+
+### User Scenario Stories
+
+**Scenario 1: Successful Reservation**
+
+| Field | Value |
+|-------|-------|
+| **ID** | UC-01 |
+| **Title** | User completes a successful reservation |
+| **Primary Actor** | Registered user |
+| **Precondition** | User is logged in; showtime has available seats |
+| **Main Flow** | 1. User browses movie list and selects a movie<br>2. User selects a showtime<br>3. User selects desired seats on the seat map<br>4. System creates a pending booking<br>5. User enters payment details in sandbox gateway<br>6. System confirms booking and deducts seats<br>7. User receives confirmation |
+| **Postcondition** | Booking status is `confirmed`; seats are reserved |
+| **Extensions** | 5a. Payment declined → booking canceled, seats released |
 
 ![Successful Reservation](ARCHITECTURE%20IMGS/scenario-successful-reservation.png)
+
+---
+
+**Scenario 2: Simultaneous Booking (Race Condition)**
+
+| Field | Value |
+|-------|-------|
+| **ID** | UC-02 |
+| **Title** | Two users attempt to book the same seat simultaneously |
+| **Primary Actor** | Registered user A, Registered user B |
+| **Precondition** | Both users are logged in; both view the same showtime with the same seat available |
+| **Main Flow** | 1. User A selects seat S5 (pending)<br>2. User B selects seat S5 (pending)<br>3. User A completes payment first → seat S5 confirmed for A<br>4. User B completes payment → system detects seat is no longer available<br>5. System rejects B's booking and refunds |
+| **Postcondition** | Booking for A is `confirmed`; Booking for B is `canceled` or rejected |
+| **Variation** | If both complete payment within the same transaction window, database constraints ensure only one succeeds |
+
 ![Simultaneous Booking](ARCHITECTURE%20IMGS/scenario-simultaneous-booking.png)
 
 ## 10. Size and Performance
