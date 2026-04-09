@@ -13,6 +13,7 @@
 | Date | Version | Author(s) | Change |
 |---|---:|---|---|
 | 2026-04-09 | 1.0 | Team | Reordered content to required template; aligned sections with 4+1 views; fixed diagram paths. |
+| 2026-04-09 | 1.1 | Team | Added Out of Scope subsection under Scope and updated the Table of Contents. |
 
 ## Table of Contents
 
@@ -21,6 +22,7 @@
 - [Table of Contents](#table-of-contents)
 - [List of Figures](#list-of-figures)
 - [1. Scope](#1-scope)
+  - [Out of Scope](#out-of-scope)
 - [2. References](#2-references)
 - [3. Software Architecture](#3-software-architecture)
 - [4. Architectural Goals & Constraints](#4-architectural-goals--constraints)
@@ -56,6 +58,13 @@ The system provides:
 - Movie and showtime browsing
 - Seat reservation with locking to prevent double-booking
 - Booking confirmation via sandbox payment flow
+
+### Out of Scope
+
+- Real payment gateway integration or live card processing; only sandbox/test cards are supported
+- Administrative back-office features for managing movies, showtimes, screens, seats, or bookings
+- Refunds, exchanges, and edits to confirmed bookings
+- Native mobile apps, external identity providers, and other third-party integrations beyond the current web app and JWT-based login flow
 
 ## 2. References
 
