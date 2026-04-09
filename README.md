@@ -12,7 +12,7 @@
 
 ## Summary
 
-Cinema booking app with a Python backend, SQLite database, and a static HTML/CSS/JS frontend.
+Cinema booking app that lets users browse movies/showtimes, select seats, and confirm reservations through a sandbox payment flow. The system is built with a Python FastAPI backend, an SQLite database, and a static HTML/CSS/JS frontend.
 
 ## Architecture
 
