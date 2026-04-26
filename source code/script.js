@@ -504,6 +504,17 @@ async function submitPayment() {
     activeProfile = { label: 'Selected card' };
   }
 
+  var receiptWindow = null;
+  try {
+    receiptWindow = window.open('', '_blank');
+    if (receiptWindow) {
+      receiptWindow.document.write('<!DOCTYPE html><html><head><title>Preparing Confirmation</title></head><body style="font-family:Segoe UI,Arial,sans-serif;padding:24px;background:#f5f5f5;color:#111827;"><p>Processing payment confirmation...</p></body></html>');
+      receiptWindow.document.close();
+    }
+  } catch (popupError) {
+    receiptWindow = null;
+  }
+
   setPaymentBusy(true);
   setCheckoutStatus('processing', 'Processing payment', 'Submitting the sandbox card to the gateway.');
   setCheckoutResult('Transaction is being processed.', 'idle');
@@ -536,8 +547,11 @@ async function submitPayment() {
       $('.testCard').prop('disabled', true);
 
       // Generate and download booking confirmation PDF
-      generateBookingPDF(confirm.data, checkoutState.reservation);
+      generateBookingPDF(confirm.data, checkoutState.reservation, receiptWindow);
     } else {
+      if (receiptWindow && !receiptWindow.closed) {
+        receiptWindow.close();
+      }
       checkoutState.reservation = null;
       setCheckoutStatus('failure', 'Payment declined', 'Sandbox gateway rejected the card and released the reservation.');
       setCheckoutResult(
@@ -546,6 +560,9 @@ async function submitPayment() {
       );
     }
   } catch (error) {
+    if (receiptWindow && !receiptWindow.closed) {
+      receiptWindow.close();
+    }
     setCheckoutStatus('failure', 'Payment error', error.message || 'The gateway request failed.');
     setCheckoutResult(error.message || 'Unable to process payment.', 'failure');
   } finally {
@@ -554,7 +571,7 @@ async function submitPayment() {
 }
 
 // Generate Booking Confirmation PDF
-function generateBookingPDF(paymentData, reservation) {
+function generateBookingPDF(paymentData, reservation, printWindow) {
   var username = localStorage.getItem('username') || 'Guest';
   var timestamp = new Date().toLocaleString();
   var seats = reservation.seat_labels ? reservation.seat_labels.join(', ') : '-';
@@ -665,8 +682,6 @@ function generateBookingPDF(paymentData, reservation) {
 </html>
   `;
 
-  // Create a temporary window and load the content
-  var printWindow = window.open('', '_blank');
   if (printWindow) {
     printWindow.document.write(pdfContent);
     printWindow.document.close();

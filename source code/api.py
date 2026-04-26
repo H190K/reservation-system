@@ -1,15 +1,3 @@
-from starlette.middleware import Middleware
-
-original_iter = Middleware.__iter__
-
-
-def patched_iter(self):
-    yield self.cls
-    yield {**dict(self.args), **self.kwargs}
-
-
-Middleware.__iter__ = patched_iter
-
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 import hashlib
